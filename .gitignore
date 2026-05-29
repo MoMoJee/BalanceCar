@@ -1,0 +1,51 @@
+# CMake / Ninja / CLion build outputs
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+build.ninja
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+.ninja_deps
+.ninja_log
+Testing/
+
+# Firmware images and link maps
+*.elf
+*.hex
+*.bin
+*.map
+*.axf
+
+# Keil build outputs
+Objects/
+Listings/
+RTE/
+*.bak
+*.build_log.htm
+*.htm
+*.lnp
+*.sct
+*.dep
+*.crf
+*.d
+*.o
+*.obj
+*.lst
+*.iex
+*.i
+*.ii
+
+# IDE / user state
+.idea/
+DebugConfig/
+*.uvopt
+*.uvoptx
+*.uvgui.*
+*.uvgui_*
+*.uvguix.*
+*.scvd
+
+# OS noise
+Thumbs.db
+Desktop.ini
