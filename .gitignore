@@ -37,7 +37,6 @@ RTE/
 *.ii
 
 # IDE / user state
-.idea/
 DebugConfig/
 *.uvopt
 *.uvoptx
