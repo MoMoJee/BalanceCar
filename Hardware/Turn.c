@@ -9,6 +9,10 @@
 #define TURN_MAX_OUTPUT         30
 #define TURN_GYRO_ZERO_OFFSET   0
 #define TURN_OUTPUT_DIR         1
+#define TURN_TEST_ENABLE        1
+#define TURN_TEST_PERIOD_TICKS  200
+#define TURN_TEST_ROTATE_TICKS  100
+#define TURN_TEST_TARGET_DPS    60
 
 typedef struct {
     int16_t targetDps;
@@ -19,6 +23,7 @@ typedef struct {
 } TurnPID_t;
 
 static TurnPID_t g_turnPid = {0};
+static uint16_t g_turnTestTick = 0;
 
 static int16_t turn_clamp_i32(int32_t val, int32_t min, int32_t max)
 {
@@ -58,11 +63,28 @@ void Turn_Reset(void)
     g_turnPid.error = 0;
     g_turnPid.integral = 0;
     g_turnPid.output = 0;
+    g_turnTestTick = 0;
 }
 
 void Turn_SetTarget(int16_t targetDps)
 {
     g_turnPid.targetDps = turn_clamp_i32(targetDps, -TURN_MAX_TARGET_DPS, TURN_MAX_TARGET_DPS);
+}
+
+void Turn_TestTick(void)
+{
+#if TURN_TEST_ENABLE
+    g_turnTestTick++;
+    if (g_turnTestTick >= TURN_TEST_PERIOD_TICKS) {
+        g_turnTestTick = 0;
+    }
+
+    if (g_turnTestTick < TURN_TEST_ROTATE_TICKS) {
+        Turn_SetTarget(TURN_TEST_TARGET_DPS);
+    } else {
+        Turn_SetTarget(0);
+    }
+#endif
 }
 
 int16_t Turn_Calc(int16_t gyroZRaw)

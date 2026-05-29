@@ -88,6 +88,7 @@ void TIM4_IRQHandler(void)//中断服务函数
 
 			PID_SetTargetOffset(Speed_Calc());
 			j = PID_Calc((int16_t)(Angle + ((Angle >= 0) ? 0.5f : -0.5f)));
+			Turn_TestTick();
 			turn = Turn_Calc(GZ);
 			leftPwm = clamp_i32((int32_t)j + turn, -100, 100);
 			rightPwm = clamp_i32((int32_t)j - turn, -100, 100);
