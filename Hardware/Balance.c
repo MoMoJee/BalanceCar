@@ -6,6 +6,7 @@
 #define PID_KI      150       /* 积分系数 (放大1000倍) */
 #define PID_KD      4500    /* 微分系数 (放大1000倍) */
 #define PID_ZERO_OFFSET  (-6)   /* 零点偏置：实测平衡点对应的角度 */
+#define PID_TARGET_LIMIT 10     /* 速度环允许修正的最大目标角度 */
 
 #define PID_DT_MS   5       /* 控制周期 ms */
 #define PID_SCALE   1000    /* 定点缩放倍数 */
@@ -24,6 +25,7 @@ typedef struct {
 } PID_t;
 
 static PID_t g_pid = {0};
+static int16_t g_pid_target_offset = 0;
 
 /* ========== 限幅函数 ========== */
 int16_t clamp_i32(int32_t val, int32_t min, int32_t max)
@@ -49,6 +51,12 @@ void PID_Init(void)
     g_pid.error_last = 0;
     g_pid.integral = 0;
     g_pid.output = 0;
+    g_pid_target_offset = 0;
+}
+
+void PID_SetTargetOffset(int16_t targetOffset)
+{
+    g_pid_target_offset = clamp_i32(targetOffset, -PID_TARGET_LIMIT, PID_TARGET_LIMIT);
 }
 
 /* ========== PID 计算 ========== */
@@ -59,8 +67,8 @@ int16_t PID_Calc(int16_t angle)
     int32_t sum;
     int32_t output_raw;
 
-    /* 计算误差: 目标零点 - 当前角度 */
-    g_pid.error = (int32_t)PID_ZERO_OFFSET - (int32_t)angle;
+    /* 计算误差: 目标零点 + 速度环修正 - 当前角度 */
+    g_pid.error = (int32_t)PID_ZERO_OFFSET + (int32_t)g_pid_target_offset - (int32_t)angle;
 
     /* 比例项 */
     p_term = PID_KP * g_pid.error;

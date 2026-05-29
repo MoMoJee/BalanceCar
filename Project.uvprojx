@@ -635,6 +635,16 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\Blance.h</FilePath>
             </File>
+            <File>
+              <FileName>Speed.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\Speed.c</FilePath>
+            </File>
+            <File>
+              <FileName>Speed.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\Speed.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

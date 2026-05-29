@@ -7,6 +7,7 @@
 #include "PWM.h"
 #include "Motortwo.h"
 #include "Blance.h"
+#include "Speed.h"
 #include <math.h>
 volatile uint8_t RunFlag = 0;
 
@@ -28,6 +29,7 @@ int main(void)
 	TIM4_Init();
 	Motortwo_Init();
 	PID_Init();
+	Speed_Init();
 	Delay_ms(500);
 	RunFlag = 1;
 	while(1)
@@ -51,6 +53,8 @@ void TIM4_IRQHandler(void)//中断服务函数
 		{
 			Motorleft_SetSpeed(0);
 			Motorright_SetSpeed(0);
+			PID_Init();
+			Speed_Reset();
 			return;
 		}
 
@@ -70,9 +74,12 @@ void TIM4_IRQHandler(void)//中断服务函数
 				RunFlag = 0;
 				Motorleft_SetSpeed(0);
 				Motorright_SetSpeed(0);
+				PID_Init();
+				Speed_Reset();
 				return;
 			}
 
+			PID_SetTargetOffset(Speed_Calc());
 			j = PID_Calc((int16_t)(Angle + ((Angle >= 0) ? 0.5f : -0.5f)));
 			Motorleft_SetSpeed(j);
 			Motorright_SetSpeed(j);
