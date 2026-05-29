@@ -53,6 +53,16 @@ gcc.exe "D:\PROJECTS\balancecar 直立环\User\main.c" -o main
 cmake --build --preset arm-gcc-debug
 ```
 
+不要用普通 Application 配置直接运行 `balancecar.elf`。它是 Cortex-M3 固件，不是 Windows 可执行程序；如果看到 `CreateProcess error=193, %1 不是有效的 Win32 应用程序`，说明 CLion 正在把 ELF 当本机程序启动。
+
+烧录时使用 CMake 目标 `flash`，它会先生成 `balancecar.hex`，再调用 STM32CubeProgrammer 通过 ST-Link/SWD 下载并复位：
+
+```powershell
+cmake --build --preset arm-gcc-debug --target flash
+```
+
+在 CLion 里可以从 CMake/Build Targets 中选择 `flash` 目标进行构建；调试则使用 Embedded GDB Server / ST-Link 配置，不要使用普通 CMake Application 的 Run。
+
 构建成功后会在 CMake build 目录里生成：
 
 - `balancecar.elf`

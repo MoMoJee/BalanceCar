@@ -107,12 +107,24 @@ set_target_properties(${PROJECT_NAME}.elf PROPERTIES
 
 find_program(ARM_OBJCOPY arm-none-eabi-objcopy)
 find_program(ARM_SIZE arm-none-eabi-size)
+find_program(STM32_PROGRAMMER_CLI
+    NAMES STM32_Programmer_CLI STM32_Programmer_CLI.exe
+    HINTS "C:/ST/STM32CubeCLT_1.20.0/STM32CubeProgrammer/bin"
+)
+
+set(FIRMWARE_HEX ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.hex)
+set(FIRMWARE_BIN ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin)
 
 if(ARM_OBJCOPY)
-    add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
-        COMMAND ${ARM_OBJCOPY} -O ihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.hex
-        COMMAND ${ARM_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}.elf> ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin
+    add_custom_command(OUTPUT ${FIRMWARE_HEX} ${FIRMWARE_BIN}
+        COMMAND ${ARM_OBJCOPY} -O ihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${FIRMWARE_HEX}
+        COMMAND ${ARM_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}.elf> ${FIRMWARE_BIN}
+        DEPENDS ${PROJECT_NAME}.elf
         COMMENT "Generating HEX and BIN images"
+    )
+
+    add_custom_target(firmware_images ALL
+        DEPENDS ${FIRMWARE_HEX} ${FIRMWARE_BIN}
     )
 endif()
 
@@ -120,5 +132,13 @@ if(ARM_SIZE)
     add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${ARM_SIZE} $<TARGET_FILE:${PROJECT_NAME}.elf>
         COMMENT "Printing firmware size"
+    )
+endif()
+
+if(STM32_PROGRAMMER_CLI AND ARM_OBJCOPY)
+    add_custom_target(flash
+        COMMAND ${STM32_PROGRAMMER_CLI} -c port=SWD -w ${PROJECT_NAME}.hex -v -rst
+        DEPENDS firmware_images
+        COMMENT "Flashing ${FIRMWARE_HEX} via ST-LINK"
     )
 endif()
