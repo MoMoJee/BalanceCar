@@ -55,6 +55,7 @@ set(PROJECT_SOURCES
     Hardware/OLED_Data.c
     Hardware/PWM.c
     Hardware/Speed.c
+    Hardware/Turn.c
 
     User/main.c
     User/stm32f10x_it.c

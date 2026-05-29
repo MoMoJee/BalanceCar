@@ -645,6 +645,16 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\Speed.h</FilePath>
             </File>
+            <File>
+              <FileName>Turn.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\Turn.c</FilePath>
+            </File>
+            <File>
+              <FileName>Turn.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\Turn.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

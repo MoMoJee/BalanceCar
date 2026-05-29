@@ -8,6 +8,7 @@
 #include "Motortwo.h"
 #include "Blance.h"
 #include "Speed.h"
+#include "Turn.h"
 #include <math.h>
 volatile uint8_t RunFlag = 0;
 
@@ -18,6 +19,9 @@ uint8_t ID;								//定义用于存放ID号的变量
 int16_t AX, AY, AZ, GX, GY, GZ;			//定义用于存放各个数据的变量
 int i=0,m=0,n=0;
 int16_t j = 0;
+int16_t turn = 0;
+int16_t leftPwm = 0;
+int16_t rightPwm = 0;
 // volatile int stay = 0; // Cleaned up unused variable
 
 int main(void)
@@ -30,6 +34,7 @@ int main(void)
 	Motortwo_Init();
 	PID_Init();
 	Speed_Init();
+	Turn_Init();
 	Delay_ms(500);
 	RunFlag = 1;
 	while(1)
@@ -55,6 +60,7 @@ void TIM4_IRQHandler(void)//中断服务函数
 			Motorright_SetSpeed(0);
 			PID_Init();
 			Speed_Reset();
+			Turn_Reset();
 			return;
 		}
 
@@ -76,13 +82,17 @@ void TIM4_IRQHandler(void)//中断服务函数
 				Motorright_SetSpeed(0);
 				PID_Init();
 				Speed_Reset();
+				Turn_Reset();
 				return;
 			}
 
 			PID_SetTargetOffset(Speed_Calc());
 			j = PID_Calc((int16_t)(Angle + ((Angle >= 0) ? 0.5f : -0.5f)));
-			Motorleft_SetSpeed(j);
-			Motorright_SetSpeed(j);
+			turn = Turn_Calc(GZ);
+			leftPwm = clamp_i32((int32_t)j + turn, -100, 100);
+			rightPwm = clamp_i32((int32_t)j - turn, -100, 100);
+			Motorleft_SetSpeed((int8_t)leftPwm);
+			Motorright_SetSpeed((int8_t)rightPwm);
 		}
 	}
 }
